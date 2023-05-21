@@ -3,22 +3,26 @@ blueprint:
   description: Get advanced notification and history for scheduled events that need reminders
   domain: automation
   input:
-    reminder_time:
-      name: Reminder time
-      description: At what time do you want to be reminded
+    schedule_time:
+      name: Dedicated schedule helper
+      description: Create and set a new Helper for the schedule this reminder needs
+        to run for. i.e. New Helper of type Schedule. Create the ehlper before this Automation.
       selector:
-        time: {}
+        entity:
+          domain:
+          - schedule
+          multiple: false
     notify_device:
       name: Notification
       description: Device needs to run the official Home Assistant app to receive
-        notifications
+        notifications. Long press the notification in iOS to update the reminder.
       selector:
         device:
           integration: mobile_app
           multiple: false
     input_boolean:
       name: Dedicated input_boolean
-      description: Create and set here an input_boolean to handle history and state
+      description: Create and then set here an input_boolean to handle history and state
         of the automation
       selector:
         entity:
@@ -85,8 +89,11 @@ blueprint:
       default: []
   source_url: https://raw.githubusercontent.com/AnnoyedPlatypus/homeassistant-blueprints/main/blueprints/schedule_reminder_ios.yaml
 trigger:
-- platform: time
-  at: !input reminder_time
+- platform: state
+  entity_id:
+    - !input schedule_time
+  from: "off"
+  to: "on"
 mode: restart
 action:
 - service: input_boolean.turn_off
